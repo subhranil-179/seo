@@ -15,6 +15,9 @@ class Tool:
         self.error_headers = ""
         self.errors = []
         self.output_len = 0
+        self.options = ["Get Keywords from Slugs",
+                        "Get all URLs from Sitemaps",
+                        "Get URL for Ubersuggest"]
 
     def get_data(self):
         print("Enter list of URLs: (Press Ctrl+d twice aftering entering all urls)\n" + divider, end="")
@@ -22,13 +25,17 @@ class Tool:
         print("\n" + divider + "Processing...")
 
     def get_choice(self):
-        print("1: Get Keywords from Slugs\n2: Get all URLs from Sitemaps")
+        for i in range(len(self.options)):
+            print(f"{i+1}: {self.options[i]}")
         self.choice = int(input("Enter number: "))
 
     def output_data(self):
         print(divider + self.output)
         pc3copy(self.output)
-        print(divider + f"{self.output_len} lines copied to clipboard")
+        if self.output_len == 1:
+            print(divider + f"{self.output_len} line copied to clipboard")
+        else:
+            print(divider + f"{self.output_len} lines copied to clipboard")
 
     def show_errors(self):
         print(divider, tabulate(self.errors, headers=self.error_headers))
@@ -81,6 +88,15 @@ class Tool:
         self.output_len = len(bulk_urls)
         self.error_headers = ['Domain', 'Posts', 'Response']
 
+    def get_ubersuggest_url(self):
+        occurance_count = self.data.count(":") + self.data.count(":")
+
+        for i in range(occurance_count):
+            self.data = self.data.replace("/", "%2F").replace(":", "%3A")
+
+        self.output = f"https://app.neilpatel.com/en/traffic_analyzer/overview?domain={self.data}&lang=en&locId=2840&mode=url"
+        self.output_len = 1
+
     def run(self):
         self.__class__.get_choice(self)
         self.__class__.get_data(self)
@@ -89,6 +105,8 @@ class Tool:
                 self.__class__.deslugify(self)
             case 2:
                 self.__class__.get_all_urls(self)
+            case 3:
+                self.__class__.get_ubersuggest_url(self)
         self.__class__.output_data(self)
         if self.errors:
             self.__class__.show_errors(self)
